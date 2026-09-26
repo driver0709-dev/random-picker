@@ -1,7 +1,7 @@
 'use strict';
 
 // При изменении файлов приложения увеличьте версию — старый кэш будет удалён.
-const CACHE = 'random-picker-v7';
+const CACHE = 'random-picker-v8';
 const ASSETS = [
   './',
   './index.html',

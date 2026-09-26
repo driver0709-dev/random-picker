@@ -132,6 +132,8 @@ h2 {
   box-shadow: 0 2px 8px rgba(164, 102, 106, .3);
 }
 .segmented .locked::after { content: " 🔒"; font-size: 12px; }
+.segmented-sm { margin-top: -6px; }
+.season-note { margin: -8px 0 0; text-align: center; }
 
 .control {
   min-height: var(--tap);

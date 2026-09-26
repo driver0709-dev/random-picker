@@ -30,6 +30,12 @@
       <button type="button" role="radio" data-profile="custom">Свой список</button>
     </div>
 
+    <div id="seasonSwitch" class="segmented segmented-sm" role="radiogroup" aria-label="Режим" hidden>
+      <button type="button" role="radio" data-season="summer">☀️ Летний</button>
+      <button type="button" role="radio" data-season="winter">❄️ Зимний</button>
+    </div>
+    <p id="seasonNote" class="muted small season-note" hidden>Только зоны спереди — под одеялом до спины не добраться</p>
+
     <!-- Свой список (виден только в профиле «Свой список») -->
     <section id="customCard" class="card" aria-labelledby="customTitle" hidden>
       <h2 id="customTitle">Варианты</h2>

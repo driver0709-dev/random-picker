@@ -3,11 +3,14 @@
 const STORAGE_KEY = 'random-picker:v3';
 const LEGACY_KEYS = ['random-picker:v2', 'random-picker:v1'];
 const PROFILES = ['guy', 'girl', 'custom'];
+const SEASONS = ['summer', 'winter'];
 
 const $ = (sel) => document.querySelector(sel);
 
 const el = {
   profileSwitch: $('#profileSwitch'),
+  seasonSwitch: $('#seasonSwitch'),
+  seasonNote: $('#seasonNote'),
   customCard: $('#customCard'),
   addForm: $('#addForm'),
   addInput: $('#addInput'),
@@ -82,6 +85,7 @@ function pickRandom(items, n) {
 function defaultState() {
   return {
     profile: 'custom',
+    season: 'summer', // 'winter' — только зоны спереди
     age: null, // null — не спрашивали, 'yes' / 'no' — ответ пользователя
     count: 1,
     custom: [],
@@ -96,6 +100,7 @@ function load() {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (raw && typeof raw === 'object') {
       if (PROFILES.includes(raw.profile)) s.profile = raw.profile;
+      if (SEASONS.includes(raw.season)) s.season = raw.season;
       if (raw.age === 'yes' || raw.age === 'no') s.age = raw.age;
       s.count = Math.max(1, Number(raw.count) || 1);
       s.custom = cleanStrings(raw.custom);
@@ -140,7 +145,8 @@ const adultAllowed = () => state.age === 'yes';
 function buildPool() {
   if (state.profile === 'custom') return state.custom.slice();
   const src = state.profile === 'guy' ? window.PRESETS.GUY : window.PRESETS.GIRL;
-  const seen = new Set();
+  // Зимой задние зоны исключаются: помечаем их как уже «виденные».
+  const seen = new Set(state.season === 'winter' ? (window.PRESETS.BACK || []).map(dedupKey) : []);
   const pool = [];
   for (const name of src) {
     const k = dedupKey(name);
@@ -191,6 +197,12 @@ function renderProfile() {
     const p = btn.dataset.profile;
     btn.setAttribute('aria-checked', String(p === state.profile));
     btn.classList.toggle('locked', !adult && p !== 'custom');
+  }
+  // Режим сезона имеет смысл только для стандартных списков.
+  el.seasonSwitch.hidden = state.profile === 'custom';
+  el.seasonNote.hidden = state.profile === 'custom' || state.season !== 'winter';
+  for (const btn of el.seasonSwitch.querySelectorAll('[data-season]')) {
+    btn.setAttribute('aria-checked', String(btn.dataset.season === state.season));
   }
 }
 
@@ -327,6 +339,15 @@ async function selectProfile(profile) {
 el.profileSwitch.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-profile]');
   if (btn) selectProfile(btn.dataset.profile);
+});
+
+el.seasonSwitch.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-season]');
+  if (!btn || btn.dataset.season === state.season) return;
+  state.season = btn.dataset.season;
+  save();
+  hideResult();
+  render();
 });
 
 el.countSelect.addEventListener('change', () => {
