@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Случайный выбор</title>
+  <meta name="description" content="Случайный выбор N вариантов из списка. Игра «Найди стикер». Работает офлайн.">
+  <meta name="theme-color" content="#f6ede6" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#221a1b" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Выбор">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Основной экран -->
+  <main id="mainScreen" class="app">
+    <header class="app-header">
+      <h1>Случайный выбор</h1>
+    </header>
+
+    <div id="profileSwitch" class="segmented" role="radiogroup" aria-label="Профиль">
+      <button type="button" role="radio" data-profile="guy">Парень</button>
+      <button type="button" role="radio" data-profile="girl">Девушка</button>
+      <button type="button" role="radio" data-profile="custom">Свой список</button>
+    </div>
+
+    <!-- Свой список (виден только в профиле «Свой список») -->
+    <section id="customCard" class="card" aria-labelledby="customTitle" hidden>
+      <h2 id="customTitle">Варианты</h2>
+
+      <form id="addForm" class="row" autocomplete="off">
+        <label class="visually-hidden" for="addInput">Новый вариант</label>
+        <input id="addInput" class="control grow" type="text" placeholder="Новый вариант" enterkeyhint="done" maxlength="200">
+        <button type="submit" class="btn btn-primary">Добавить</button>
+      </form>
+
+      <details class="bulk">
+        <summary>Добавить списком</summary>
+        <label class="visually-hidden" for="bulkInput">Варианты, каждый с новой строки</label>
+        <textarea id="bulkInput" class="control" rows="5" placeholder="Каждый вариант с новой строки"></textarea>
+        <button type="button" id="bulkAddBtn" class="btn btn-primary btn-block">Добавить все</button>
+      </details>
+
+      <div class="items-head">
+        <span id="counter">Всего вариантов: 0</span>
+        <button type="button" id="clearBtn" class="btn btn-ghost btn-danger">Очистить всё</button>
+      </div>
+
+      <ul id="itemsList" class="items"></ul>
+      <p id="emptyItems" class="muted empty">Список пуст — добавьте варианты выше.</p>
+    </section>
+
+    <section class="card">
+      <div class="row count-row">
+        <label for="countSelect" class="grow">
+          Сколько выбрать
+          <span id="poolInfo" class="muted small">В пуле: 0</span>
+        </label>
+        <select id="countSelect" class="control count-select"></select>
+      </div>
+    </section>
+
+    <button type="button" id="pickBtn" class="btn btn-primary btn-big btn-block">Выбрать</button>
+    <p id="pickHint" class="muted hint">Добавьте хотя бы один вариант, чтобы сделать выбор.</p>
+
+    <section id="resultCard" class="card result" aria-live="polite" hidden>
+      <h2>Результат</h2>
+      <ol id="resultList" class="result-list"></ol>
+      <div id="phrasesBlock" class="phrases" hidden>
+        <h3>Скажи</h3>
+        <ul id="phrasesList" class="phrases-list"></ul>
+      </div>
+      <div class="row">
+        <button type="button" id="againBtn" class="btn btn-primary grow">Выбрать ещё раз</button>
+        <button type="button" id="copyBtn" class="btn grow">Копировать</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Подтверждение возраста -->
+  <div id="ageModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="ageTitle" hidden>
+    <div class="modal-box">
+      <div class="modal-badge">18+</div>
+      <h2 id="ageTitle">Этот режим содержит контент 18+</h2>
+      <p>Вам есть 18 лет?</p>
+      <div class="row">
+        <button type="button" id="ageNoBtn" class="btn grow">Нет</button>
+        <button type="button" id="ageYesBtn" class="btn btn-primary grow">Да</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="data/presets.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
