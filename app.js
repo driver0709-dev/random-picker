@@ -80,6 +80,22 @@ function pickRandom(items, n) {
   return a.slice(0, n);
 }
 
+// Случайная выборка n пунктов, в которой «ограниченных» (isLimited) не больше maxLimited:
+// перетасовываем весь пул и берём пункты по порядку, пропуская лишние ограниченные.
+function pickLimited(items, n, isLimited, maxLimited) {
+  const result = [];
+  let limited = 0;
+  for (const it of pickRandom(items, items.length)) {
+    if (result.length >= n) break;
+    if (isLimited(it)) {
+      if (limited >= maxLimited) continue;
+      limited++;
+    }
+    result.push(it);
+  }
+  return result;
+}
+
 /* ---------- Состояние ---------- */
 
 function defaultState() {
@@ -135,6 +151,7 @@ function save() {
 
 const PHRASES_PER_ROUND = 2;
 const MAX_PICK = 10; // больше 10 вариантов за раз выбрать нельзя
+const MAX_INTIMATE = 2; // интимных зон в одном результате не больше этого числа
 
 let state = load();
 let lastResult = [];
@@ -165,6 +182,12 @@ function phrasesFor(profile) {
     .map((p) => (typeof p === 'string' ? p : p[profile]))
     .filter((p) => typeof p === 'string' && normalize(p))
     .map(normalize);
+}
+
+// Интимные зоны текущего профиля (ключи для сравнения); в «Своем списке» их нет.
+function intimateKeys(profile) {
+  const list = (window.PRESETS.INTIMATE || {})[profile] || [];
+  return new Set(list.map(dedupKey));
 }
 
 /* ---------- Подтверждение возраста ---------- */
@@ -297,7 +320,9 @@ function doPick() {
   if (!pool.length) return;
   const n = Math.min(Number(el.countSelect.value) || 1, pool.length, MAX_PICK);
   const phrases = phrasesFor(state.profile);
-  showResult(pickRandom(pool, n), pickRandom(phrases, Math.min(PHRASES_PER_ROUND, phrases.length)));
+  const intimate = intimateKeys(state.profile);
+  const zones = pickLimited(pool, n, (name) => intimate.has(dedupKey(name)), MAX_INTIMATE);
+  showResult(zones, pickRandom(phrases, Math.min(PHRASES_PER_ROUND, phrases.length)));
   el.resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
