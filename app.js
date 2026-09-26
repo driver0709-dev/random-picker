@@ -129,6 +129,7 @@ function save() {
 }
 
 const PHRASES_PER_ROUND = 2;
+const MAX_PICK = 10; // больше 10 вариантов за раз выбрать нельзя
 
 let state = load();
 let lastResult = [];
@@ -230,8 +231,9 @@ function renderCount(pool) {
     el.countSelect.replaceChildren(o);
     el.countSelect.disabled = true;
   } else {
+    const max = Math.min(total, MAX_PICK);
     const opts = [];
-    for (let n = 1; n <= total; n++) {
+    for (let n = 1; n <= max; n++) {
       const o = document.createElement('option');
       o.value = n;
       o.textContent = n;
@@ -239,8 +241,8 @@ function renderCount(pool) {
     }
     el.countSelect.replaceChildren(...opts);
     el.countSelect.disabled = false;
-    // Сохранённое значение не трогаем, лишь ограничиваем размером пула.
-    el.countSelect.value = String(Math.min(state.count, total));
+    // Сохранённое значение не трогаем, лишь ограничиваем доступным максимумом.
+    el.countSelect.value = String(Math.min(state.count, max));
   }
   el.pickBtn.disabled = total < 1;
   el.pickHint.hidden = total >= 1;
@@ -281,7 +283,7 @@ function hideResult() {
 function doPick() {
   const pool = buildPool();
   if (!pool.length) return;
-  const n = Math.min(Number(el.countSelect.value) || 1, pool.length);
+  const n = Math.min(Number(el.countSelect.value) || 1, pool.length, MAX_PICK);
   const phrases = phrasesFor(state.profile);
   showResult(pickRandom(pool, n), pickRandom(phrases, Math.min(PHRASES_PER_ROUND, phrases.length)));
   el.resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
